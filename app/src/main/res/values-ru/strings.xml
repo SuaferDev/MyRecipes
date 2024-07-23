@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Мои Рецепты</string>
+
+    <!-- MainActivity -->
+    <string name="main_activity_name">Name</string>
+    <string name="main_activity_login">Login</string>
+    <string name="main_activity_login_edit">Email</string>
+    <string name="main_activity_password">Password</string>
+    <string name="main_activity_password_confirm">Confirm password</string>
+    <string name="main_activity_password_edit">Your secret password</string>
+    <string name="main_activity_login_in">Log in</string>
+    <string name="main_activity_or">or</string>
+    <string name="main_activity_no_account">No account?</string>
+    <string name="main_activity_no_password">Forgot your password?</string>
+
+    <!-- Error -->
+    <string name="error_empty">Input fields are empty, out of order</string>
+    <string name="error_internet">It looks like there is no account with this email</string>
+    <string name="error_email">Wow, there is no account with this email yet</string>
+    <string name="error_password">Incorrect password</string>
+    <string name="error_unknown">Unknown error</string>
+
+
+    <!-- RecipesActivity -->
+    <string name="recipes_activity_search">Name, ingredients…</string>
+    <string name="sort_AZ">A-Z</string>
+    <string name="sort_ZA">Z-F</string>
+    <string name="sort_new">New</string>
+    <string name="sort_ld">Old</string>
+</resources>
