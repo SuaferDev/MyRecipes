@@ -6,11 +6,16 @@
         <item name="android:windowEnterAnimation">@anim/loading_animation_create</item>
         <item name="android:windowExitAnimation">@anim/loading_animation_exit</item>
     </style>
+    <style name="DialogLoadingAnim">
+        <item name="android:windowEnterAnimation">@anim/loading_animation_create</item>
+        <item name="android:windowExitAnimation">@anim/loading_animation_exit</item>
+    </style>
+
 
     <style name="MainActivity_Line_Gray">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">2dp</item>
-        <item name="android:background">@color/gray</item>
+        <item name="android:background">@color/gray_dark</item>
         <item name="android:layout_weight">1</item>
     </style>
 
@@ -21,9 +26,9 @@
         <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingStart">20dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textColorHint">@color/gray</item>
+        <item name="android:textColorHint">@color/gray_dark</item>
         <item name="android:background">@drawable/corner_main_dark</item>
         <item name="android:maxLines">1</item>
         <item name="android:lines">1</item>
@@ -34,18 +39,20 @@
     <style name="EntranceTextTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/main_dark_extra</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/jost</item>
+        <item name="android:layout_gravity">left</item>
     </style>
 
     <style name="EntranceTextHelp">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/gray_dark</item>
+        <item name="android:fontFamily">@font/jost</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
@@ -64,5 +71,22 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <!-- CreateActivity -->
+    <style name="EditTextInfo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/jost</item>
+        <item name="android:textColorHint">@color/gray_dark</item>
+        <item name="android:inputType">numberSigned</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:maxLength">5</item>
+    </style>
+
 
 </resources>

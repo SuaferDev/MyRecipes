@@ -29,6 +29,9 @@ data class Recipe(
     @ColumnInfo(name = "image")
     var image: ByteArray?,
 
+    @ColumnInfo(name = "description")
+    var description: String,
+
     @ColumnInfo(name = "type")
     var type: String,
 

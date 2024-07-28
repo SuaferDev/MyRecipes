@@ -1,17 +1,20 @@
 package com.suafer.myrecipes
 
+import android.animation.ObjectAnimator
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,12 +26,11 @@ import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
-import com.suafer.myrecipes.database.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RecipesActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
 
     private lateinit var listRecipes : ListView
 
@@ -37,9 +39,16 @@ class RecipesActivity : AppCompatActivity() {
     private lateinit var textAZ : TextView
     private lateinit var textZA : TextView
 
+    private lateinit var linearFilter : HorizontalScrollView
+    private lateinit var linearType : HorizontalScrollView
+
+    private lateinit var i : Intent
+
     private lateinit var dataBase : MyRecipesDataBase
     private var recipes : List<Recipe> = listOf()
     private lateinit var linearNoElement : LinearLayout
+
+    private var navigationStatus : Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +60,7 @@ class RecipesActivity : AppCompatActivity() {
             insets
         }
 
-        window.statusBarColor = ContextCompat.getColor(this, R.color.background)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.background)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
@@ -59,11 +68,16 @@ class RecipesActivity : AppCompatActivity() {
 
         init()
         getRecipes()
+
     }
 
     private fun init(){
         listRecipes = findViewById(R.id.list_recipes)
         val editTextSearch = findViewById<EditText>(R.id.edit_text_search)
+        val linearAdd = findViewById<LinearLayout>(R.id.linear_add)
+
+        linearFilter = findViewById(R.id.linear_filter)
+        linearType = findViewById(R.id.linear_type)
 
         textNew = findViewById(R.id.text_new)
         textOld = findViewById(R.id.text_old)
@@ -78,32 +92,43 @@ class RecipesActivity : AppCompatActivity() {
 
         textZA.setOnClickListener { setFilter(textZA) }
 
-        val imageAdd = findViewById<ImageView>(R.id.image_add)
+        val linearTopMenu = findViewById<LinearLayout>(R.id.linear_top_menu)
+        val imageArrow = findViewById<ImageView>(R.id.image_arrow)
+
+        linearTopMenu.setOnClickListener{
+            TransitionManager.beginDelayedTransition(linearTopMenu)
+            navigationStatus = if(navigationStatus){
+                setVisibility(View.VISIBLE)
+                rotateImage(imageArrow, 0f, 180f)
+                false
+            }else{
+                setVisibility(View.GONE)
+                rotateImage(imageArrow, 180f, 0f)
+                true
+            }
+        }
+
+
         linearNoElement = findViewById(R.id.linear_no_element)
 
         listRecipes.setOnItemClickListener { _, _, position, _ ->
             createRecipePreviewDialog(recipes[position])
         }
 
-        imageAdd.setOnClickListener {
-            val res = Recipe(null, Tool.getTime(),"test", null, "te", 2, 123, "", UserData.instance.id!!)
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                dataBase.dao().insertRecipe(res)
-                updateList()
-                withContext(Dispatchers.Main) {
-                }
-            }
-            updateList()
+        linearAdd.setOnClickListener {
+            val i = Intent(this, CreateActivity::class.java)
+            startActivity(i)
         }
     }
 
     private fun createRecipePreviewDialog(recipe : Recipe){
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.recipe_preview)
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window!!.attributes.windowAnimations = R.style.DialogAnimationTop
+        dialog.window!!.statusBarColor = ContextCompat.getColor(this, R.color.background)
+        dialog.window!!.navigationBarColor = ContextCompat.getColor(this, R.color.background)
         dialog.setCancelable(true)
 
         //findViewById<ImageView>(R.id.image_food).setImageResource()
@@ -143,13 +168,26 @@ class RecipesActivity : AppCompatActivity() {
     }
 
     private fun updateList(){
-        val adapter = CustomRecipeAdapter(this@RecipesActivity, recipes)
+        val adapter = CustomRecipeAdapter(this@SearchActivity, recipes)
         listRecipes.adapter = adapter
         setNoElement(recipes.size)
     }
 
     private fun setNoElement(size : Int){
-        linearNoElement.visibility = if(size != 0){ View.VISIBLE
+        linearNoElement.visibility = if(size == 0){ View.VISIBLE
         }else{ View.GONE }
+    }
+
+    private fun setVisibility(view: Int) {
+        linearFilter.visibility = view
+        linearType.visibility = view
+        //linearProfile.visibility = view
+        //linearTime.visibility = view
+    }
+
+    private fun rotateImage(imageView: ImageView, from : Float, to : Float){
+        val rotationAnimation = ObjectAnimator.ofFloat(imageView, "rotation", from, to)
+        rotationAnimation.duration = 500
+        rotationAnimation.start()
     }
 }

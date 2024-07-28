@@ -16,13 +16,13 @@
         android:theme="@style/Theme.MyRecipes"
         tools:targetApi="31">
         <activity
-            android:name=".RecipeInfoActivity"
+            android:name=".RecipeActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateRecipeActivity"
+            android:name=".CreateActivity"
             android:exported="false" />
         <activity
-            android:name=".RecipesActivity"
+            android:name=".SearchActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

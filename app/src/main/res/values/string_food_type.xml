@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="food_type">
+        <item>Breakfast</item>
+        <item>Omelettes and scrambled eggs</item>
+        <item>Pancakes and pancakes</item>
+        <item>Porridge</item>
+        <item>Smoothies and cocktails</item>
+        <item>Toasts and sandwiches</item>
+        <item>Salads</item>
+        <item>Canapé</item>
+        <item>Bruschetta</item>
+        <item>Dips and sauces</item>
+        <item>Sandwiches</item>
+        <item>Burger</item>
+        <item>Shawarma</item>
+        <item>Meat dishes</item>
+        <item>Fish dishes</item>
+        <item>Bird</item>
+        <item>Vegetarian dishes</item>
+        <item>Pasta and noodles</item>
+        <item>Pizza</item>
+        <item>Vegetable side dishes</item>
+        <item>Cereals and grains</item>
+        <item>Potato dishes</item>
+        <item>Beans</item>
+        <item>Classic soups</item>
+        <item>Cream soups</item>
+        <item>Broths</item>
+        <item>Cold soups</item>
+        <item>Pies and cakes</item>
+        <item>Cookies and cakes</item>
+        <item>Ice cream</item>
+        <item>Fruits and berries</item>
+        <item>Mousses and jellies</item>
+        <item>Cocktails</item>
+        <item>Smoothie</item>
+        <item>Hot drinks</item>
+        <item>Soft drinks</item>
+        <item>Bread</item>
+        <item>Buns and croissants</item>
+        <item>Pies and pastries</item>
+        <item>Pizza</item>
+        <item>Sauces</item>
+        <item>Marinades for meat</item>
+        <item>Salad dressings</item>
+        <item>Dessert sauces</item>
+    </string-array>
+
+</resources>

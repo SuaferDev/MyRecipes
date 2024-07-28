@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="food_type">
+        <item>Завтрак</item>
+        <item>Омлеты и яичницы</item>
+        <item>Блины и оладьи</item>
+        <item>Каши</item>
+        <item>Смузи и коктейли</item>
+        <item>Тосты и бутерброды</item>
+        <item>Салаты</item>
+        <item>Канапе</item>
+        <item>Брускетты</item>
+        <item>Дипы и соусы</item>
+        <item>Сэндвичи</item>
+        <item>Бургер</item>
+        <item>Шаурма</item>
+        <item>Мясные блюда</item>
+        <item>Рыбные блюда</item>
+        <item>Птица</item>
+        <item>Вегетарианские блюда</item>
+        <item>Паста и лапша</item>
+        <item>Пицца</item>
+        <item>Овощные гарниры</item>
+        <item>Крупы и злаки</item>
+        <item>Картофельные блюда</item>
+        <item>Бобовые</item>
+        <item>Классические супы</item>
+        <item>Крем-супы</item>
+        <item>Бульоны</item>
+        <item>Холодные супы</item>
+        <item>Пироги и торты</item>
+        <item>Печенье и пирожные</item>
+        <item>Мороженое</item>
+        <item>Фрукты и ягоды</item>
+        <item>Муссы и желе</item>
+        <item>Коктейли</item>
+        <item>Смузи</item>
+        <item>Горячие напитки</item>
+        <item>Прохладительные напитки</item>
+        <item>Хлеб</item>
+        <item>Булочки и круассаны</item>
+        <item>Пирожки и пирожные</item>
+        <item>Пицца</item>
+        <item>Соусы</item>
+        <item>Маринады для мяса</item>
+        <item>Салатные заправки</item>
+        <item>Десертные соусы</item>
+    </string-array>
+</resources>

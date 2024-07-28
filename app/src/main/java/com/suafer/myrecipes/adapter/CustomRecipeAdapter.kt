@@ -9,18 +9,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.suafer.myrecipes.R
+import com.suafer.myrecipes.app.Constant.Companion.PADDING_CATEGORY_LEFT
 import com.suafer.myrecipes.app.Constant.Companion.PADDING_CATEGORY_SIDE
 import com.suafer.myrecipes.app.Constant.Companion.PADDING_CATEGORY_TOP
 import com.suafer.myrecipes.database.Recipe
 
 
-class CustomRecipeAdapter(private val context: Activity, arr: List<Recipe>) :
+class CustomRecipeAdapter(private val context: Activity, private val arr: List<Recipe>) :
     ArrayAdapter<Any?>(context, R.layout.recipe_element, arr as List<Any?>) {
 
-    private val arr : List<Recipe>
-    private val height = 140
-
-    init { this.arr = arr}
+    private val height = 250
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val inflater = context.layoutInflater
@@ -33,11 +31,11 @@ class CustomRecipeAdapter(private val context: Activity, arr: List<Recipe>) :
         val textTime = view.findViewById<TextView>(R.id.text_time)
         val textKcal = view.findViewById<TextView>(R.id.text_kcal)
 
-        if(position == 0) linear.setPadding(PADDING_CATEGORY_SIDE, height, PADDING_CATEGORY_SIDE,0)
+        if(position == 0) linear.setPadding(PADDING_CATEGORY_SIDE, height, PADDING_CATEGORY_SIDE, PADDING_CATEGORY_TOP)
         else{
-            if(position == arr.size - 1) linear.setPadding(PADDING_CATEGORY_SIDE, PADDING_CATEGORY_TOP, PADDING_CATEGORY_SIDE, height)
+            if(position == arr.size - 1) linear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, height)
             else{
-                linear.setPadding(PADDING_CATEGORY_SIDE, PADDING_CATEGORY_TOP, PADDING_CATEGORY_SIDE,0)
+                linear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP)
             }
         }
         //imageFood.setImageResource()
@@ -46,7 +44,7 @@ class CustomRecipeAdapter(private val context: Activity, arr: List<Recipe>) :
         textTime.text = str
         textKcal.text = arr[position].calories.toString()
 
-        val animation = AnimationUtils.loadAnimation(context, R.anim.anim_move_up)
+        val animation = AnimationUtils.loadAnimation(context, R.anim.anim_move_top)
         view.startAnimation(animation)
         return view
     }

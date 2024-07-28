@@ -13,7 +13,7 @@
     <!-- Вспомогательные цвета -->
     <color name="red">#800000</color>
     <color name="none">#00FFFFFF</color>
-    <color name="background">#F1F1F1</color>
+    <color name="background">#E3E3E3</color>
 
     <color name="gray_light">#C5C5C5</color>
     <color name="gray">#FF959595</color>
