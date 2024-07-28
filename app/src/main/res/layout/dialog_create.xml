@@ -15,109 +15,108 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linear"
+        <LinearLayout
+            android:id="@+id/linear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:gravity="bottom"
+            android:layout_gravity="bottom"
+            android:paddingBottom="20dp"
+            android:background="@drawable/background_dialog_create"
+            tools:ignore="MissingConstraints">
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="20dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:gravity="bottom"
-                android:layout_gravity="bottom"
-                android:paddingBottom="20dp"
-                android:background="@drawable/background_dialog_create"
-                tools:ignore="MissingConstraints">
+                android:text="@string/main_activity_create_dialog"
+                android:textColor="@color/main_dark_extra"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:fontFamily="@font/jost"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/main_activity_create_dialog"
-                    android:textColor="@color/main_dark_extra"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:gravity="center"
-                    android:fontFamily="@font/jost"/>
+            <TextView
+                android:text="@string/main_activity_login"
+                android:fontFamily="@font/jost"
+                android:layout_gravity="start"
+                style="@style/EntranceTextTitle"/>
+            <EditText
+                android:id="@+id/edit_text_login"
+                android:hint="@string/main_activity_login_edit"
+                android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress"
+                android:layout_marginBottom="30dp"
+                style="@style/EntranceEditeTextStyle"/>
 
-                <TextView
-                    android:text="@string/main_activity_login"
-                    android:fontFamily="@font/jost"
-                    android:layout_gravity="start"
-                    style="@style/EntranceTextTitle"/>
-                <EditText
-                    android:id="@+id/edit_text_login"
-                    android:hint="@string/main_activity_login_edit"
-                    android:inputType="textEmailAddress"
-                    android:autofillHints="emailAddress"
-                    android:layout_marginBottom="30dp"
-                    style="@style/EntranceEditeTextStyle"/>
+            <TextView
+                android:text="@string/main_activity_password"
+                android:fontFamily="@font/jost"
+                android:layout_gravity="start"
+                style="@style/EntranceTextTitle"/>
+            <EditText
+                android:id="@+id/edit_text_password"
+                android:hint="@string/main_activity_login_edit"
+                android:inputType="textPassword"
+                android:autofillHints="emailAddress"
+                android:layout_marginBottom="30dp"
+                style="@style/EntranceEditeTextStyle"/>
 
-                <TextView
-                    android:text="@string/main_activity_password"
-                    android:fontFamily="@font/jost"
-                    android:layout_gravity="start"
-                    style="@style/EntranceTextTitle"/>
-                <EditText
-                    android:id="@+id/edit_text_password"
-                    android:hint="@string/main_activity_login_edit"
-                    android:inputType="textPassword"
-                    android:autofillHints="emailAddress"
-                    android:layout_marginBottom="30dp"
-                    style="@style/EntranceEditeTextStyle"/>
+            <TextView
+                android:text="@string/main_activity_password_confirm"
+                android:fontFamily="@font/jost"
+                android:layout_gravity="start"
+                style="@style/EntranceTextTitle"/>
+            <EditText
+                android:id="@+id/edit_text_password_confirm"
+                android:hint="@string/main_activity_login_edit"
+                android:inputType="textPassword"
+                android:autofillHints="emailAddress"
+                android:layout_marginBottom="30dp"
+                style="@style/EntranceEditeTextStyle"/>
 
-                <TextView
-                    android:text="@string/main_activity_password_confirm"
-                    android:fontFamily="@font/jost"
-                    android:layout_gravity="start"
-                    style="@style/EntranceTextTitle"/>
-                <EditText
-                    android:id="@+id/edit_text_password_confirm"
-                    android:hint="@string/main_activity_login_edit"
-                    android:inputType="textPassword"
-                    android:autofillHints="emailAddress"
-                    android:layout_marginBottom="30dp"
-                    style="@style/EntranceEditeTextStyle"/>
-
-                <TextView
-                    android:text="@string/main_activity_name"
-                    android:fontFamily="@font/jost"
-                    android:layout_gravity="start"
-                    style="@style/EntranceTextTitle"/>
-                <EditText
-                    android:id="@+id/edit_text_name"
-                    android:hint="@string/main_activity_name_edit"
-                    android:inputType="textEmailAddress"
-                    android:autofillHints="emailAddress"
-                    android:layout_marginBottom="30dp"
-                    style="@style/EntranceEditeTextStyle"/>
+            <TextView
+                android:text="@string/main_activity_name"
+                android:fontFamily="@font/jost"
+                android:layout_gravity="start"
+                style="@style/EntranceTextTitle"/>
+            <EditText
+                android:id="@+id/edit_text_name"
+                android:hint="@string/main_activity_name_edit"
+                android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress"
+                android:layout_marginBottom="30dp"
+                style="@style/EntranceEditeTextStyle"/>
 
 
-                <TextView
-                    android:id="@+id/text_enter"
-                    android:fontFamily="@font/jost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/main_activity_create_dialog"
-                    android:textSize="22sp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingStart="50dp"
-                    android:paddingEnd="50dp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginBottom="30dp"
-                    android:background="@drawable/background_main_dark"
-                    android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/text_enter"
+                android:fontFamily="@font/jost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_activity_create_dialog"
+                android:textSize="22sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingStart="50dp"
+                android:paddingEnd="50dp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/background_main_dark"
+                android:layout_gravity="center"/>
 
-            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -53,6 +53,10 @@
     <string name="create_activity_steps">New step</string>
     <string name="create_activity_save">save</string>
 
-
+    <!-- WarningDialogCreate -->
+    <string name="warning_create_dialog_title">Cancel creation</string>
+    <string name="warning_create_dialog_message">Are you sure you want to close this window? Data will NOT be saved</string>
+    <string name="warning_create_dialog_ok">Close</string>
+    <string name="warning_create_dialog_no">Cansel</string>
 
 </resources>
