@@ -11,14 +11,13 @@ import com.suafer.myrecipes.database.Step
 
 class CustomStepAdapter(private val steps: List<Step>) : RecyclerView.Adapter<CustomStepAdapter.StepViewHolder>() {
 
+    var height: Int = 0
+        private set
+
     class StepViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textCount = itemView.findViewById<TextView>(R.id.text_count)
         val textTime = itemView.findViewById<TextView>(R.id.text_time)
         val textDescription = itemView.findViewById<TextView>(R.id.text_description)
-        // Здесь находим элементы вашего макета step_element
-        // Например:
-        // val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
-        // val descriptionTextView: TextView = itemView.findViewById(R.id.descriptionTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StepViewHolder {
@@ -30,14 +29,17 @@ class CustomStepAdapter(private val steps: List<Step>) : RecyclerView.Adapter<Cu
     override fun onBindViewHolder(holder: StepViewHolder, position: Int) {
         val step = steps[position]
         holder.textCount.text = (position + 1).toString()
-        holder.textTime.text = step.time.toString() + " m"
+        holder.textTime.text = "${step.time} m"
         holder.textDescription.text = step.description
-        // Заполняем элементы вашего макета данными
-        // holder.titleTextView.text = step.title
-        // holder.descriptionTextView.text = step.description
+
+        // Measure the itemView to get its height
+        holder.itemView.post {
+            height += holder.itemView.height
+        }
     }
 
     override fun getItemCount(): Int {
         return steps.size
     }
 }
+

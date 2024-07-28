@@ -1,4 +1,4 @@
-package com.suafer.myrecipes
+package com.suafer.myrecipes.activity
 
 import android.app.Dialog
 import android.graphics.Color
@@ -6,10 +6,8 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.ArrayAdapter
@@ -30,12 +28,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
+import com.suafer.myrecipes.R
 import com.suafer.myrecipes.adapter.CustomStepAdapter
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
 import com.suafer.myrecipes.database.Step
-import com.suafer.myrecipes.database.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,7 +54,7 @@ class CreateActivity : AppCompatActivity() {
     private lateinit var editName : EditText
     private lateinit var editTime : EditText; private lateinit var editKcal : EditText
     private lateinit var editDescription : EditText
-    private lateinit var edit_type: AutoCompleteTextView
+    private lateinit var editType: AutoCompleteTextView
     private lateinit var ingredientsGroup : ChipGroup
     private lateinit var editIngredients : EditText; private lateinit var editCount : EditText
 
@@ -72,7 +70,7 @@ class CreateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_create_recipe)
+        setContentView(R.layout.activity_create)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -120,10 +118,10 @@ class CreateActivity : AppCompatActivity() {
             override fun afterTextChanged(editable: Editable) {}
         })
 
-        edit_type = findViewById(R.id.edit_type)
+        editType = findViewById(R.id.edit_type)
         val countries: Array<out String> = resources.getStringArray(R.array.food_type)
         ArrayAdapter(this, android.R.layout.simple_list_item_1, countries).also { adapter ->
-            edit_type.setAdapter(adapter)
+            editType.setAdapter(adapter)
         }
 
         findViewById<ImageView>(R.id.image_food).setOnClickListener { createWarningDialog() }
@@ -183,33 +181,7 @@ class CreateActivity : AppCompatActivity() {
                 val step = Step(null, description, time.toDouble(), -1)
                 steps.add(step)
                 updateStep()
-            }
-        }; dialog.show()
-    }
-
-    private fun createStepDialog(i : Int) {
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.step_create)
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimationTop
-        dialog.window!!.statusBarColor = ContextCompat.getColor(this, R.color.background)
-        dialog.window!!.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        dialog.setCancelable(true)
-
-        val imageFood = dialog.findViewById<ImageView>(R.id.image_food)
-        val editTime = dialog.findViewById<EditText>(R.id.edit_time)
-        val editDescription = dialog.findViewById<EditText>(R.id.edit_description)
-        val textEnter = dialog.findViewById<TextView>(R.id.text_enter)
-
-        textEnter.setOnClickListener {
-            val time = editTime.text.toString()
-            val description = editDescription.text.toString()
-            if(time.isEmpty() || description.isEmpty()){
-            }else{
-                val step = Step(null, description, time.toDouble(), -1)
-                steps.add(step)
-                updateStep()
+                dialog.dismiss()
             }
         }; dialog.show()
     }
@@ -271,6 +243,10 @@ class CreateActivity : AppCompatActivity() {
         listStep.layoutManager = LinearLayoutManager(this)
         val adapter = CustomStepAdapter(steps)
         listStep.adapter = adapter
+/*
+        val params: ViewGroup.LayoutParams = listStep.layoutParams
+        params.height = 1000
+        listStep.layoutParams = params*/
     }
 
 
