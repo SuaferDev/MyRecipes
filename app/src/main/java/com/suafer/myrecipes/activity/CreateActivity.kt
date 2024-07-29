@@ -6,6 +6,8 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -28,8 +30,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.suafer.myrecipes.R
-import com.suafer.myrecipes.adapter.CustomStepAdapter
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
@@ -57,8 +60,7 @@ class CreateActivity : AppCompatActivity() {
     private lateinit var editType: AutoCompleteTextView
     private lateinit var ingredientsGroup : ChipGroup
     private lateinit var editIngredients : EditText; private lateinit var editCount : EditText
-
-    private lateinit var listStep : RecyclerView
+    private lateinit var linearSteps : LinearLayout
 
     private lateinit var dataBase : MyRecipesDataBase
 
@@ -92,8 +94,7 @@ class CreateActivity : AppCompatActivity() {
         ingredientsGroup = findViewById(R.id.ingredientsGroup)
         editIngredients = findViewById(R.id.edit_ingredients); editCount = findViewById(R.id.edit_count)
 
-        listStep = findViewById(R.id.list_step)
-
+        linearSteps = findViewById(R.id.linear_steps)
         editName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) { name = editName.text.toString() }
@@ -149,11 +150,18 @@ class CreateActivity : AppCompatActivity() {
         val data : String = LocalDateTime.now().format(formatter)
 
         val recipe = Recipe(null, data, name, null, description, type, time, calories, stringList(), UserData.instance.id!!)
-
         lifecycleScope.launch(Dispatchers.IO) {
-            dataBase.dao().insertRecipe(recipe)
+            val id = dataBase.dao().insertRecipe(recipe)
+            for(step in steps){
+                if(id != null){
+                    step.recipeId = id.toInt()
+                    dataBase.dao().insertStep(step)
+                }
+
+            }
             withContext(Dispatchers.Main) {
                 dialogLoading.dismiss()
+                finish()
             }
         }
     }
@@ -227,26 +235,36 @@ class CreateActivity : AppCompatActivity() {
     private fun updateIngredients(){
         ingredientsGroup.removeAllViews()
         for(ingredient in ingredients){
-            val chip = Chip(this).apply {
+            val chip = LayoutInflater.from(this).inflate(R.layout.chip_element, ingredientsGroup, false) as Chip
+            chip.apply {
                 text = ingredient
-                setTextColor(resources.getColor(R.color.black, theme))
-                textSize = 20f
-                typeface = ResourcesCompat.getFont(context, R.font.jost)
-                setChipDrawable(ChipDrawable.createFromAttributes(context, null, 0, com.google.android.material.R.style.Widget_Material3_ChipGroup))
-                setOnCloseIconClickListener { ingredientsGroup.removeView(this); ingredients.remove(ingredient); updateIngredients() }
+                setOnClickListener {
+                    ingredientsGroup.removeView(this);
+                    ingredients.remove(ingredient);
+                    updateIngredients()
+                    Log.d("ingredient", ingredients.size.toString())
+                }
             }
+
             ingredientsGroup.addView(chip)
         }
     }
 
     private fun updateStep(){
-        listStep.layoutManager = LinearLayoutManager(this)
-        val adapter = CustomStepAdapter(steps)
-        listStep.adapter = adapter
-/*
-        val params: ViewGroup.LayoutParams = listStep.layoutParams
-        params.height = 1000
-        listStep.layoutParams = params*/
+        linearSteps.removeAllViews()
+        for (i in 0 until steps.size) {
+            val itemView = LayoutInflater.from(this).inflate(R.layout.step_element, linearSteps, false)
+            val textCount = itemView.findViewById<TextView>(R.id.text_count)
+            val textTime = itemView.findViewById<TextView>(R.id.text_time)
+            val textDescription = itemView.findViewById<TextView>(R.id.text_description)
+            var str = (i + 1).toString()
+            textCount.text = str
+            str = "${steps[i].time} m"
+            textTime.text = str
+            textDescription.text = steps[i].description
+
+            linearSteps.addView(itemView)
+        }
     }
 
 

@@ -27,7 +27,7 @@ interface MyRecipesDAO {
 
     /** Рецепт **/
     @Insert
-    fun insertRecipe(recipe: Recipe)
+    fun insertRecipe(recipe: Recipe) : Long?
     @Query("SELECT * FROM recipes WHERE userId = :userId")
     fun getAllRecipes(userId: Int): MutableList<Recipe>
     @Query("DELETE FROM recipes WHERE id = :recipeId")

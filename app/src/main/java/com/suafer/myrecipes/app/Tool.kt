@@ -27,5 +27,9 @@ class Tool {
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
             return currentDateTime.format(formatter)
         }
+
+        fun findByName(recipes: List<Recipe>, query: String): List<Recipe> {
+            return recipes.filter { it.name.contains(query, ignoreCase = true) }
+        }
     }
 }
