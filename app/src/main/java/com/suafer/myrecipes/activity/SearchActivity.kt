@@ -27,8 +27,10 @@ import com.suafer.myrecipes.R
 import com.suafer.myrecipes.adapter.CustomRecipeAdapter
 import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.UserData
+import com.suafer.myrecipes.app.Viewer
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
+import com.suafer.myrecipes.dialog.PreviewDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,14 +69,14 @@ class SearchActivity : AppCompatActivity() {
         window.navigationBarColor = ContextCompat.getColor(this, R.color.background)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
-        dataBase = MyRecipesDataBase.get(this)
-
         init()
         getRecipes()
 
     }
 
     private fun init(){
+        dataBase = MyRecipesDataBase.get(this)
+
         listRecipes = findViewById(R.id.list_recipes)
         val editTextSearch = findViewById<EditText>(R.id.edit_text_search)
         val linearAdd = findViewById<LinearLayout>(R.id.linear_add)
@@ -127,9 +129,7 @@ class SearchActivity : AppCompatActivity() {
 
         linearNoElement = findViewById(R.id.linear_no_element)
 
-        listRecipes.setOnItemClickListener { _, _, position, _ ->
-            createRecipePreviewDialog(recipes[position])
-        }
+        listRecipes.setOnItemClickListener { _, _, position, _ -> PreviewDialog.show(this, recipes[position]) }
 
         linearAdd.setOnClickListener {
             val i = Intent(this, CreateActivity::class.java)
@@ -137,40 +137,9 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun createRecipePreviewDialog(recipe : Recipe){
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.recipe_preview)
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimationTop
-        dialog.window!!.statusBarColor = ContextCompat.getColor(this, R.color.background)
-        dialog.window!!.navigationBarColor = ContextCompat.getColor(this, R.color.background)
-        dialog.setCancelable(true)
-
-        //findViewById<ImageView>(R.id.image_food).setImageResource()
-        dialog.findViewById<TextView>(R.id.text_name).text = recipe.name
-        dialog.findViewById<TextView>(R.id.text_time).text = recipe.time.toString()
-        dialog.findViewById<TextView>(R.id.text_kcal).text = recipe.calories.toString()
-        dialog.findViewById<TextView>(R.id.text_ingredients).text = recipe.ingredients
-
-        dialog.findViewById<TextView>(R.id.button_detail).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-
-    }
-
-    private fun clearAllFilter(){ clearFilter(textNew); clearFilter(textOld); clearFilter(textAZ); clearFilter(textZA) }
-
-    private fun clearFilter(textView : TextView){
-        textView.setBackgroundResource(R.drawable.corner_main_dark)
-        textView.setTextColor(getColor(R.color.main_dark_extra))
-    }
-
     private fun setFilter(textView : TextView){
-        clearAllFilter()
-        textView.setBackgroundResource(R.drawable.background_main_color)
+        Viewer.clearAllFilter(this, textNew, textOld, textAZ, textZA)
+        textView.setBackgroundResource(R.drawable.background_main_dark)
         textView.setTextColor(getColor(R.color.white))
     }
 

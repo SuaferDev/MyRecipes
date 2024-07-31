@@ -31,11 +31,7 @@ class LoadingDialog(context: Context) {
         imageLoading.startAnimation(rotateAnimation)
     }
 
-    fun show() {
-        dialogLoading.show()
-    }
+    fun show() { dialogLoading.show() }
 
-    fun close() {
-        dialogLoading.dismiss()
-    }
+    fun close() { dialogLoading.dismiss() }
 }

@@ -6,42 +6,36 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
-import android.view.animation.RotateAnimation
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.suafer.myrecipes.R
 import com.suafer.myrecipes.app.UserData
+import com.suafer.myrecipes.app.Viewer.Companion.setDefaultEdit
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
 import com.suafer.myrecipes.database.Step
+import com.suafer.myrecipes.dialog.LoadingDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.suafer.myrecipes.app.Viewer.Companion.hintColor
 
 
 class CreateActivity : AppCompatActivity() {
@@ -53,20 +47,17 @@ class CreateActivity : AppCompatActivity() {
     private val ingredients : MutableList<String> = mutableListOf()
     private val steps : MutableList<Step> = mutableListOf()
 
-    /** **/
     private lateinit var editName : EditText
     private lateinit var editTime : EditText; private lateinit var editKcal : EditText
     private lateinit var editDescription : EditText
     private lateinit var editType: AutoCompleteTextView
+    private lateinit var textIngredients : TextView
     private lateinit var ingredientsGroup : ChipGroup
     private lateinit var editIngredients : EditText; private lateinit var editCount : EditText
     private lateinit var linearSteps : LinearLayout
 
     private lateinit var dataBase : MyRecipesDataBase
-
-
-    private lateinit var dialogLoading : Dialog
-
+    private lateinit var loadingDialog: LoadingDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,52 +73,60 @@ class CreateActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.gray_light)
 
-        dataBase = MyRecipesDataBase.get(this)
+
         init()
     }
 
     private fun init(){
+
+        dataBase = MyRecipesDataBase.get(this)
+        loadingDialog = LoadingDialog(this)
+
         editName = findViewById(R.id.edit_name)
         editTime = findViewById(R.id.edit_time); editKcal = findViewById(R.id.edit_kcal)
         editDescription = findViewById(R.id.edit_description)
 
         ingredientsGroup = findViewById(R.id.ingredientsGroup)
         editIngredients = findViewById(R.id.edit_ingredients); editCount = findViewById(R.id.edit_count)
+        textIngredients = findViewById(R.id.text_ingredients)
 
         linearSteps = findViewById(R.id.linear_steps)
+
         editName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) { name = editName.text.toString() }
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                name = editName.text.toString(); hintColor(this@CreateActivity, editName, R.color.black) }
             override fun afterTextChanged(editable: Editable) {}
         })
 
         editTime.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) { time = editTime.text.toString().toInt() }
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                time = editTime.text.toString().toInt(); hintColor(this@CreateActivity, editTime, R.color.black) }
             override fun afterTextChanged(editable: Editable) {}
         })
 
         editKcal.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) { calories = editKcal.text.toString().toInt() }
-            override fun afterTextChanged(editable: Editable) {}
-        })
-
-        editKcal.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) { calories = editKcal.text.toString().toInt() }
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                calories = editKcal.text.toString().toInt();  hintColor(this@CreateActivity, editKcal, R.color.black) }
             override fun afterTextChanged(editable: Editable) {}
         })
 
         editType = findViewById(R.id.edit_type)
         val countries: Array<out String> = resources.getStringArray(R.array.food_type)
-        ArrayAdapter(this, android.R.layout.simple_list_item_1, countries).also { adapter ->
-            editType.setAdapter(adapter)
-        }
+        ArrayAdapter(this, android.R.layout.simple_list_item_1, countries).also { adapter -> editType.setAdapter(adapter) }
+        editType.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                textIngredients.setTextColor(getColor(R.color.black))
+                type = editType.text.toString(); setDefaultEdit(editType, this@CreateActivity) }
+            override fun afterTextChanged(editable: Editable) {}
+        })
 
         findViewById<ImageView>(R.id.image_food).setOnClickListener { createWarningDialog() }
 
-        findViewById<LinearLayout>(R.id.linear_add).setOnClickListener{ createLoadingDialog(); save() }
+        findViewById<LinearLayout>(R.id.linear_add).setOnClickListener{ if(checkField()){ loadingDialog.show(); save() } }
 
         findViewById<LinearLayout>(R.id.linear_add_step).setOnClickListener { createStepDialog() }
 
@@ -135,10 +134,10 @@ class CreateActivity : AppCompatActivity() {
             val ingredient = editIngredients.text.toString()
             val count = editCount.text.toString()
             if(ingredient.isEmpty() || count.isEmpty()){
-
+                Toast.makeText(this, "поля пустые", Toast.LENGTH_LONG).show()
             }else{
                 ingredients.add("$ingredient ⨯$count")
-                editIngredients.setText(""); editCount.setText("")
+                editIngredients.setText(R.string.none); editCount.setText(R.string.none)
                 updateIngredients()
             }
         }
@@ -159,10 +158,7 @@ class CreateActivity : AppCompatActivity() {
                 }
 
             }
-            withContext(Dispatchers.Main) {
-                dialogLoading.dismiss()
-                finish()
-            }
+            withContext(Dispatchers.Main) { loadingDialog.close(); finish() }
         }
     }
 
@@ -194,28 +190,6 @@ class CreateActivity : AppCompatActivity() {
         }; dialog.show()
     }
 
-    private fun createLoadingDialog() { /** Создание диалога загрузки **/
-        dialogLoading = Dialog(this)
-        dialogLoading.setContentView(R.layout.loading_dialog)
-        dialogLoading.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        dialogLoading.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogLoading.window!!.attributes.windowAnimations = R.style.DialogLoadingAnim
-        dialogLoading.setCancelable(false)
-
-        val imageLoading = dialogLoading.findViewById<ImageView>(R.id.imageLoading)
-
-        val rotateAnimation = RotateAnimation(0f, 360f,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f)
-        rotateAnimation.interpolator = LinearInterpolator()
-        rotateAnimation.duration = 1000
-        rotateAnimation.repeatCount = Animation.INFINITE
-
-        imageLoading.startAnimation(rotateAnimation)
-
-        dialogLoading.show()
-    }
-
     private fun createWarningDialog(){
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.create_warning_dialog)
@@ -242,10 +216,8 @@ class CreateActivity : AppCompatActivity() {
                     ingredientsGroup.removeView(this);
                     ingredients.remove(ingredient);
                     updateIngredients()
-                    Log.d("ingredient", ingredients.size.toString())
                 }
             }
-
             ingredientsGroup.addView(chip)
         }
     }
@@ -267,10 +239,33 @@ class CreateActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkField() : Boolean {
+        var value = true
+        if(name.isEmpty()){
+            value = false; hintColor(this@CreateActivity, editName, R.color.main_dark_extra)
+        }
+        if(time == 0){
+            value = false; hintColor(this@CreateActivity, editTime, R.color.main_dark_extra)
+        }
+        if(calories == 0){
+            value = false; hintColor(this@CreateActivity, editKcal, R.color.main_dark_extra)
+        }
+        if(type.isEmpty()){
+            value = false; hintColor(this@CreateActivity, editType, R.color.main_dark_extra)
+        }
+        if(ingredients.isEmpty()){
+            value = false; textIngredients.setTextColor(getColor(R.color.main_dark_extra))
+        }
+        if(steps.isEmpty()){
+            value = false
+        }
+        return value
+    }
+
 
     private fun stringList() : String{
         var str = ""
-        for(i in ingredients){ str += "$i " }
+        for(i in ingredients){ str += "$i/" }
         return str
     }
 }
