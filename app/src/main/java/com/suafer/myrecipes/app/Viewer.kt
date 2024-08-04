@@ -1,9 +1,14 @@
 package com.suafer.myrecipes.app
 
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.suafer.myrecipes.R
 
 class Viewer {
@@ -42,6 +47,26 @@ class Viewer {
         fun closeKeyboard(context: Context, editText: EditText) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(editText.windowToken, 0)
+        }
+
+        fun rotate(imageView: ImageView, from : Float, to : Float){
+            val rotationAnimation = ObjectAnimator.ofFloat(imageView, "rotation", from, to)
+            rotationAnimation.duration = 500
+            rotationAnimation.start()
+        }
+
+        fun createIngredients(ingredientsGroup : ChipGroup, ingredients : List<String>, context: Context){
+            ingredientsGroup.removeAllViews()
+            for(ingredient in ingredients){
+                if(ingredient.isNotEmpty()){
+                    val chip = LayoutInflater.from(context).inflate(R.layout.chip_element, ingredientsGroup, false) as Chip
+                    chip.apply {
+                        text = ingredient
+                    }
+                    ingredientsGroup.addView(chip)
+                }
+
+            }
         }
 
     }

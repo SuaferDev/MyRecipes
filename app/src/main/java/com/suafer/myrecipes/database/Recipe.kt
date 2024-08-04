@@ -26,9 +26,6 @@ data class Recipe(
     @ColumnInfo(name = "name")
     var name: String,
 
-    @ColumnInfo(name = "image")
-    var image: ByteArray?,
-
     @ColumnInfo(name = "description")
     var description: String,
 
@@ -60,10 +57,6 @@ data class Recipe(
         if (time != other.time) return false
         if (calories != other.calories) return false
         if (ingredients != other.ingredients) return false
-        if (image != null) {
-            if (other.image == null) return false
-            if (!image.contentEquals(other.image)) return false
-        } else if (other.image != null) return false
         if (userId != other.userId) return false
 
         return true
@@ -77,7 +70,6 @@ data class Recipe(
         result = 31 * result + time
         result = 31 * result + calories
         result = 31 * result + ingredients.hashCode()
-        result = 31 * result + (image?.contentHashCode() ?: 0)
         result = 31 * result + userId
         return result
     }

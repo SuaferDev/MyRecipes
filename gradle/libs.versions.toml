@@ -13,6 +13,7 @@ constraintlayout = "2.1.4"
 roomKtx = "2.5.0"
 roomKtxVersion = "2.4.3"
 roomRuntime = "2.6.1"
+databindingRuntime = "8.5.1"
 
 [libraries]
 android-room-ktx = { module = "android.room:room-ktx", version.ref = "roomKtxVersion" }
@@ -28,6 +29,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version.ref = "databindingRuntime" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -28,21 +28,33 @@ interface MyRecipesDAO {
     /** Рецепт **/
     @Insert
     fun insertRecipe(recipe: Recipe) : Long?
+
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    fun getRecipe(id: Int): Recipe?
+
     @Query("SELECT * FROM recipes WHERE userId = :userId")
     fun getAllRecipes(userId: Int): MutableList<Recipe>
+
     @Query("DELETE FROM recipes WHERE id = :recipeId")
     fun deleteRecipe(recipeId: Int)
+
     @Update
     fun updateRecipe(recipe: Recipe)
 
     /** Шаги рецепта **/
     @Insert
     fun insertStep(step: Step)
+
     @Query("SELECT * FROM steps WHERE recipeId = :recipeId")
-    fun getAllSteps(recipeId: Int): Flow<MutableList<Step>>
+    fun getAllSteps(recipeId: Int): MutableList<Step>
+
     @Query("DELETE FROM steps WHERE id = :stepId")
     fun deleteStep(stepId: Int)
+
     @Update
     fun updateStep(step: Step)
+
+    @Query("SELECT * FROM steps WHERE id = :id")
+    fun getStep(id : Int) : Step?
 
 }

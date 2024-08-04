@@ -112,12 +112,6 @@
                 android:id="@+id/text_create_account"
                 android:text="@string/main_activity_no_account"
                 style="@style/EntranceTextHelp" />
-
-            <TextView
-                android:id="@+id/text_forgot_password"
-                android:text="@string/main_activity_no_password"
-                style="@style/EntranceTextHelp"/>
-
         </LinearLayout>
     </LinearLayout>
 

@@ -1,7 +1,8 @@
 package com.suafer.myrecipes.activity
 
-import android.animation.ObjectAnimator
+import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -22,38 +23,40 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.suafer.myrecipes.R
 import com.suafer.myrecipes.adapter.CustomRecipeAdapter
 import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.app.Viewer
-import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
 import com.suafer.myrecipes.dialog.PreviewDialog
+import com.suafer.myrecipes.viewmodel.SearchViewModel
+import com.suafer.myrecipes.viewmodel.SearchViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var listRecipes : ListView
+    private lateinit var listRecipes : RecyclerView
 
     private lateinit var textNew : TextView; private lateinit var textOld : TextView
     private lateinit var textAZ : TextView; private lateinit var textZA : TextView
-
     private lateinit var linearFilter : HorizontalScrollView
-    private lateinit var linearType : HorizontalScrollView
-
-    private lateinit var i : Intent
-
-    private lateinit var dataBase : MyRecipesDataBase
-    private var recipes : List<Recipe> = listOf()
     private lateinit var linearNoElement : LinearLayout
 
+    private var recipes : List<Recipe> = listOf()
     private var sortRecipes : List<Recipe> = mutableListOf()
 
+    private lateinit var viewModel : SearchViewModel
+
     private var navigationStatus : Boolean = true
+    private lateinit var adapter: CustomRecipeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,14 +78,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun init(){
-        dataBase = MyRecipesDataBase.get(this)
+        viewModel = ViewModelProvider(this, SearchViewModelFactory(this))[SearchViewModel::class.java]
 
         listRecipes = findViewById(R.id.list_recipes)
         val editTextSearch = findViewById<EditText>(R.id.edit_text_search)
         val linearAdd = findViewById<LinearLayout>(R.id.linear_add)
 
         linearFilter = findViewById(R.id.linear_filter)
-        linearType = findViewById(R.id.linear_type)
 
         textNew = findViewById(R.id.text_new)
         textOld = findViewById(R.id.text_old)
@@ -90,10 +92,10 @@ class SearchActivity : AppCompatActivity() {
         textZA = findViewById(R.id.text_za)
 
         textNew.setOnClickListener {
-            sortRecipes = Tool.sortNew(sortRecipes); updateSortList(); setFilter(textNew) }
+            sortRecipes = Tool.sortOld(sortRecipes); updateSortList(); setFilter(textNew) }
 
         textOld.setOnClickListener {
-            sortRecipes = Tool.sortOld(sortRecipes); updateSortList(); setFilter(textOld) }
+            sortRecipes = Tool.sortNew(sortRecipes); updateSortList(); setFilter(textOld) }
 
         textAZ.setOnClickListener {
             sortRecipes = Tool.sortAZ(sortRecipes); updateSortList(); setFilter(textAZ) }
@@ -108,11 +110,11 @@ class SearchActivity : AppCompatActivity() {
             TransitionManager.beginDelayedTransition(linearTopMenu)
             navigationStatus = if(navigationStatus){
                 setVisibility(View.VISIBLE)
-                rotateImage(imageArrow, 0f, 180f)
+                Viewer.rotate(imageArrow, 0f, 180f)
                 false
             }else{
                 setVisibility(View.GONE)
-                rotateImage(imageArrow, 180f, 0f)
+                Viewer.rotate(imageArrow, 180f, 0f)
                 true
             }
         }
@@ -129,11 +131,67 @@ class SearchActivity : AppCompatActivity() {
 
         linearNoElement = findViewById(R.id.linear_no_element)
 
-        listRecipes.setOnItemClickListener { _, _, position, _ -> PreviewDialog.show(this, recipes[position]) }
+        /*listRecipes.setOnItemClickListener { _, _, position, _ -> PreviewDialog.show(this, sortRecipes[position]) }*/
+
+
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                createWarning(position)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(listRecipes)
+
 
         linearAdd.setOnClickListener {
             val i = Intent(this, CreateActivity::class.java)
             startActivity(i)
+            finish()
+        }
+    }
+
+    fun createWarning(position : Int){
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.create_warning_dialog)
+        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimationTop
+        dialog.window!!.statusBarColor = ContextCompat.getColor(this, R.color.background)
+        dialog.window!!.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+        dialog.setCancelable(true)
+
+        dialog.findViewById<TextView>(R.id.text_title).text = getString(R.string.delete_dialog_title)
+        dialog.findViewById<TextView>(R.id.text_message).text = getString(R.string.delete_dialog_message)
+        dialog.findViewById<TextView>(R.id.text_delete).text = getString(R.string.delete_dialog_delete)
+
+        dialog.findViewById<TextView>(R.id.text_delete).setOnClickListener {
+            deleteElement(position, dialog)
+            updateSortList()
+        }
+        dialog.findViewById<TextView>(R.id.text_cansel).setOnClickListener {
+            updateSortList()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun deleteElement(position : Int, dialog: Dialog){
+        lifecycleScope.launch (Dispatchers.IO){
+            viewModel.delete(adapter.getID(position))
+            withContext(Dispatchers.Main){
+                dialog.dismiss()
+            }
         }
     }
 
@@ -144,27 +202,34 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun getRecipes(){
-        lifecycleScope.launch(Dispatchers.IO) {
-            if(UserData.instance.id != null){
-                recipes = dataBase.dao().getAllRecipes(UserData.instance.id!!)
-                withContext(Dispatchers.Main) {
+        if(UserData.instance.id != null){
+            viewModel.getRecipe(UserData.instance.id!!)
+            viewModel.resultLive.observe(this) { recipesList ->
+                if(recipesList != null){
+                    recipes = recipesList
                     updateList()
                 }
             }
-
         }
     }
 
     private fun updateList(){
-        val adapter = CustomRecipeAdapter(this@SearchActivity, recipes)
+        adapter = CustomRecipeAdapter(this, recipes)
         listRecipes.adapter = adapter
+        listRecipes.layoutManager = LinearLayoutManager(this)
+        /*val adapter = CustomRecipeAdapter(this@SearchActivity, recipes)
+        listRecipes.adapter = adapter*/
         setNoElement(recipes.size)
         sortRecipes = recipes
     }
 
     private fun updateSortList(){
-        val adapter = CustomRecipeAdapter(this@SearchActivity, sortRecipes)
+        adapter = CustomRecipeAdapter(this, sortRecipes)
         listRecipes.adapter = adapter
+        listRecipes.layoutManager = LinearLayoutManager(this)
+        /*
+        val adapter = CustomRecipeAdapter(this@SearchActivity, sortRecipes)
+        listRecipes.adapter = adapter*/
     }
 
     private fun setNoElement(size : Int){
@@ -172,16 +237,5 @@ class SearchActivity : AppCompatActivity() {
         }else{ View.GONE }
     }
 
-    private fun setVisibility(view: Int) {
-        linearFilter.visibility = view
-        linearType.visibility = view
-        //linearProfile.visibility = view
-        //linearTime.visibility = view
-    }
-
-    private fun rotateImage(imageView: ImageView, from : Float, to : Float){
-        val rotationAnimation = ObjectAnimator.ofFloat(imageView, "rotation", from, to)
-        rotationAnimation.duration = 500
-        rotationAnimation.start()
-    }
+    private fun setVisibility(view: Int) { linearFilter.visibility = view }
 }

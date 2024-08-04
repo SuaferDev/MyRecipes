@@ -7,7 +7,211 @@
     android:layout_height="match_parent"
     tools:context=".activity.RecipeActivity">
 
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:background="@color/white">
 
+            <ImageView
+                android:id="@+id/image_close"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/icon_close" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/image_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/icon_edit"
+                android:layout_gravity="end"
+                android:padding="4dp"/>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/linear_top"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_top_white"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="20dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:id="@+id/image_food"
+                        android:layout_width="match_parent"
+                        android:layout_height="140dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/background_new_step"
+                        android:src="@drawable/icon_add_gray" />
+
+                    <TextView
+                        android:id="@+id/text_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="24sp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/jost"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="bottom">
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:src="@drawable/icon_time"/>
+
+                        <TextView
+                            android:id="@+id/text_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="4dp"
+                            android:textSize="16sp"
+                            android:textColor="@color/gray_dark"
+                            android:fontFamily="@font/jost"/>
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:src="@drawable/icon_kcal"/>
+
+                        <TextView
+                            android:id="@+id/text_kcal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="4dp"
+                            android:textSize="16sp"
+                            android:textColor="@color/gray_dark"
+                            android:fontFamily="@font/jost"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/create_activity_category"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/jost"
+                            android:textStyle="bold"
+                            android:textSize="22sp"/>
+
+                        <TextView
+                            android:id="@+id/text_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:textSize="22sp"
+                            android:fontFamily="@font/jost"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_white"
+                    android:padding="20dp"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_activity_description"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/jost"
+                        android:textStyle="bold"
+                        android:textSize="22sp"/>
+
+                    <TextView
+                        android:id="@+id/text_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/jost"
+                        android:textSize="22sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_ingredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_white"
+                    android:padding="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_ingredients"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/recipe_preview_dialog_ingredients"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/jost"
+                        android:textStyle="bold"
+                        android:textSize="22sp"/>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/ingredientsGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipSpacing = "4dp"
+                        app:chipSpacingHorizontal = "4dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        app:chipSpacingVertical = "0dp">
+                    </com.google.android.material.chip.ChipGroup>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_steps"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

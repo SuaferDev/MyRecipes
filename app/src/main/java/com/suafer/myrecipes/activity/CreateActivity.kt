@@ -1,13 +1,22 @@
 package com.suafer.myrecipes.activity
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -24,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.suafer.myrecipes.R
+import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.app.Viewer.Companion.setDefaultEdit
 import com.suafer.myrecipes.database.MyRecipesDataBase
@@ -36,17 +46,25 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.suafer.myrecipes.app.Viewer.Companion.hintColor
+import com.suafer.myrecipes.dialog.WarningDialog
 
 
 class CreateActivity : AppCompatActivity() {
 
     /** Параметры рецепта **/
+    private var image : String? = null
     private var name = ""; private var description = ""
     private var time = 0; private var calories = 0
     private var type = ""
     private val ingredients : MutableList<String> = mutableListOf()
     private val steps : MutableList<Step> = mutableListOf()
+    private var recipeImage : Bitmap? = null
+    private val imageMap : MutableMap<String, Bitmap?> = mutableMapOf()
 
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_IMAGE_SELECT = 2
+
+    private lateinit var imageFood : ImageView
     private lateinit var editName : EditText
     private lateinit var editTime : EditText; private lateinit var editKcal : EditText
     private lateinit var editDescription : EditText
@@ -58,6 +76,8 @@ class CreateActivity : AppCompatActivity() {
 
     private lateinit var dataBase : MyRecipesDataBase
     private lateinit var loadingDialog: LoadingDialog
+
+    private var id : Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,8 +93,11 @@ class CreateActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.gray_light)
 
+        id = intent.getIntExtra("ID_VALUE", -1)
 
+        animateLinear()
         init()
+        fillFields()
     }
 
     private fun init(){
@@ -82,6 +105,7 @@ class CreateActivity : AppCompatActivity() {
         dataBase = MyRecipesDataBase.get(this)
         loadingDialog = LoadingDialog(this)
 
+        imageFood = findViewById(R.id.image_food)
         editName = findViewById(R.id.edit_name)
         editTime = findViewById(R.id.edit_time); editKcal = findViewById(R.id.edit_kcal)
         editDescription = findViewById(R.id.edit_description)
@@ -113,6 +137,14 @@ class CreateActivity : AppCompatActivity() {
             override fun afterTextChanged(editable: Editable) {}
         })
 
+        editDescription.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                description = editDescription.text.toString();
+            }
+            override fun afterTextChanged(editable: Editable) {}
+        })
+
         editType = findViewById(R.id.edit_type)
         val countries: Array<out String> = resources.getStringArray(R.array.food_type)
         ArrayAdapter(this, android.R.layout.simple_list_item_1, countries).also { adapter -> editType.setAdapter(adapter) }
@@ -120,11 +152,17 @@ class CreateActivity : AppCompatActivity() {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
                 textIngredients.setTextColor(getColor(R.color.black))
-                type = editType.text.toString(); setDefaultEdit(editType, this@CreateActivity) }
+                type = editType.text.toString(); hintColor(this@CreateActivity, editTime, R.color.black) }
             override fun afterTextChanged(editable: Editable) {}
         })
 
-        findViewById<ImageView>(R.id.image_food).setOnClickListener { createWarningDialog() }
+        findViewById<ImageView>(R.id.image_back).setOnClickListener {
+            WarningDialog.show(this, this)
+        }
+
+        findViewById<ImageView>(R.id.image_food).setOnClickListener {
+            showImageSelectionDialog()
+        }
 
         findViewById<LinearLayout>(R.id.linear_add).setOnClickListener{ if(checkField()){ loadingDialog.show(); save() } }
 
@@ -141,25 +179,133 @@ class CreateActivity : AppCompatActivity() {
                 updateIngredients()
             }
         }
+    }
 
+    private fun animateLinear(){
+        val animTop = AnimationUtils.loadAnimation(this, R.anim.anim_move_up)
+        val animDown = AnimationUtils.loadAnimation(this, R.anim.anim_move_top)
+        findViewById<LinearLayout>(R.id.linear_top).startAnimation(animDown)
+        findViewById<LinearLayout>(R.id.linear_description).startAnimation(animDown)
+        findViewById<LinearLayout>(R.id.linear_ingredients).startAnimation(animDown)
+        findViewById<LinearLayout>(R.id.linear_add).startAnimation(animTop)
+    }
+
+    private fun showImageSelectionDialog() {
+        val options = arrayOf("Сделать фото", "Выбрать из галереи")
+
+        AlertDialog.Builder(this)
+            .setTitle("Выбрать изображение")
+            .setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> captureImage()
+                    1 -> selectImageFromGallery()
+                }
+            }
+            .show()
+    }
+
+    private fun captureImage() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+            }
+        }
+    }
+
+    private fun selectImageFromGallery() {
+        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also { selectPictureIntent ->
+            selectPictureIntent.type = "image/*"
+            startActivityForResult(selectPictureIntent, REQUEST_IMAGE_SELECT)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_IMAGE_CAPTURE -> {
+                    val imageBitmap = data?.extras?.get("data") as Bitmap
+                    recipeImage = imageBitmap
+                    imageFood.setImageBitmap(imageBitmap)
+                }
+                REQUEST_IMAGE_SELECT -> {
+                    val imageUri: Uri? = data?.data
+                    val imageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, imageUri)
+                    recipeImage = imageBitmap
+                    imageFood.setImageBitmap(imageBitmap)
+                }
+            }
+        }
+    }
+
+
+    private fun fillFields(){
+        if( id != -1){
+            loadingDialog.show()
+            lifecycleScope.launch(Dispatchers.IO) {
+                val recipe = dataBase.dao().getRecipe(id)
+                if(recipe != null){
+                    name = recipe.name
+                    description = recipe.description
+                    time = recipe.time
+                    type = recipe.type
+                    calories = recipe.calories
+                    ingredients.addAll(recipe.ingredients.split("/"))
+                    steps.addAll(dataBase.dao().getAllSteps(id))
+                }
+                withContext(Dispatchers.Main) {
+                    val recipeImage = Tool.getImage("recipe_$id", this@CreateActivity)
+                    if(recipeImage != null){
+                        imageFood.setImageBitmap(recipeImage)
+                        imageFood.scaleType = ImageView.ScaleType.CENTER_CROP
+                        imageFood.setBackgroundResource(R.color.none)
+                    }
+                    editName.setText(name);  editDescription.setText(description)
+                    editType.setText(type)
+                    editTime.setText(time.toString()); editKcal.setText(calories.toString())
+                    updateIngredients(); updateStep()
+                    loadingDialog.close();
+                }
+            }
+        }
     }
 
     private fun save(){
-        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-        val data : String = LocalDateTime.now().format(formatter)
+        val data : String = Tool.getTime()
 
-        val recipe = Recipe(null, data, name, null, description, type, time, calories, stringList(), UserData.instance.id!!)
+        val recipe = Recipe(null, data, name, description, type, time, calories, stringList(), UserData.instance.id!!)
+        var resultMessage = ""
         lifecycleScope.launch(Dispatchers.IO) {
-            val id = dataBase.dao().insertRecipe(recipe)
-            for(step in steps){
-                if(id != null){
-                    step.recipeId = id.toInt()
-                    dataBase.dao().insertStep(step)
-                }
-
+            val idRecipe = if (id != -1) {
+                resultMessage = string(R.string.create_activity_update)
+                recipe.id = id
+                dataBase.dao().updateRecipe(recipe)
+                id
+            } else {
+                resultMessage = string(R.string.create_activity_create)
+                dataBase.dao().insertRecipe(recipe)
             }
-            withContext(Dispatchers.Main) { loadingDialog.close(); finish() }
+            if(recipeImage != null){
+                Tool.saveImage(recipeImage!!, "recipe_$idRecipe", this@CreateActivity)
+            }
+
+            for (step in steps) {
+                step.recipeId = idRecipe!!.toInt()
+                if (step.id == null) {
+                    dataBase.dao().insertStep(step)
+                } else {
+                    dataBase.dao().updateStep(step)
+                }
+            }
+            withContext(Dispatchers.Main) {
+                loadingDialog.close()
+                Toast.makeText(this@CreateActivity, resultMessage, Toast.LENGTH_LONG).show()
+                val i = Intent(this@CreateActivity, SearchActivity::class.java)
+                startActivity(i)
+                finish()
+            }
         }
+
     }
 
     private fun createStepDialog() {
@@ -182,28 +328,12 @@ class CreateActivity : AppCompatActivity() {
             val description = editDescription.text.toString()
             if(time.isEmpty() || description.isEmpty()){
             }else{
-                val step = Step(null, description, time.toDouble(), -1)
+                val step = Step(null, null, description, time.toDouble(), -1)
                 steps.add(step)
                 updateStep()
                 dialog.dismiss()
             }
         }; dialog.show()
-    }
-
-    private fun createWarningDialog(){
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.create_warning_dialog)
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimationTop
-        dialog.window!!.statusBarColor = ContextCompat.getColor(this, R.color.background)
-        dialog.window!!.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-        dialog.setCancelable(true)
-
-        dialog.findViewById<TextView>(R.id.text_delete).setOnClickListener { finish() }
-        dialog.findViewById<EditText>(R.id.text_cansel).setOnClickListener { dialog.dismiss() }
-
-        dialog.show()
     }
 
     private fun updateIngredients(){
@@ -268,4 +398,6 @@ class CreateActivity : AppCompatActivity() {
         for(i in ingredients){ str += "$i/" }
         return str
     }
+
+    private fun string(i : Int) : String{ return getString(i) }
 }

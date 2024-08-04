@@ -33,8 +33,8 @@ import com.suafer.myrecipes.app.Viewer.Companion.showErrorEdit
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.User
 import com.suafer.myrecipes.dialog.LoadingDialog
-import com.suafer.myrecipes.viewmodel.MainViewModel
-import com.suafer.myrecipes.viewmodel.MainViewModelFactory
+import com.suafer.myrecipes.viewmodel.EntranceViewModel
+import com.suafer.myrecipes.viewmodel.EntranceViewModelFactory
 
 /**
  * Разработано для DSR в рамках практики 2024
@@ -49,10 +49,9 @@ class EntranceActivity : AppCompatActivity() {
 
     private lateinit var dialogLoading: LoadingDialog
 
-    private lateinit var dataBase : MyRecipesDataBase
     private lateinit var popupError : PopupWindowError
 
-    private lateinit var viewModel : MainViewModel
+    private lateinit var viewModel : EntranceViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,14 +77,11 @@ class EntranceActivity : AppCompatActivity() {
     }
 
     private fun init(){
-        viewModel = ViewModelProvider(this, MainViewModelFactory(this))[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this, EntranceViewModelFactory(this))[EntranceViewModel::class.java]
         popupError = PopupWindowError(this)
-        dataBase = MyRecipesDataBase.get(this)
         dialogLoading = LoadingDialog(this)
 
-        findViewById<LinearLayout>(R.id.linear).startAnimation(AnimationUtils.loadAnimation(this,
-            R.anim.main_animation
-        ))
+        findViewById<LinearLayout>(R.id.linear).startAnimation(AnimationUtils.loadAnimation(this, R.anim.main_animation))
 
         editTextLogin = findViewById(R.id.edit_text_login)
         editTextPassword = findViewById(R.id.edit_text_password)
@@ -93,22 +89,23 @@ class EntranceActivity : AppCompatActivity() {
 
         val imageGoogle = findViewById<ImageView>(R.id.image_google)
 
-        val textForgotPassword = findViewById<TextView>(R.id.text_forgot_password)
         findViewById<TextView>(R.id.text_enter).setOnClickListener {
             Viewer.closeKeyboard(this, editTextLogin); Viewer.closeKeyboard(this, editTextPassword)
+            if(!checkInternet()){ popupError.show(string(R.string.error_internet)); return@setOnClickListener }
 
             if(ifEmpty()){
                 showErrorEdit(this, editTextLogin, editTextPassword); popupError.show(string(R.string.error_empty))
                 return@setOnClickListener
             }
-            if(!checkInternet()){ popupError.show(string(R.string.error_internet)); return@setOnClickListener }
+
 
             val login = editTextLogin.text.toString()
             val password = editTextPassword.text.toString()
 
             dialogLoading.show()
-            viewModel.getUser(login, password, dataBase)
+            viewModel.getUser(login, password)
             viewModel.resultLive.observe(this) { user ->
+                dialogLoading.close()
                 if(user != null){
                     UserData.instance.setId(user.id!!)
                     val i = Intent(this@EntranceActivity, SearchActivity::class.java)
@@ -164,7 +161,7 @@ class EntranceActivity : AppCompatActivity() {
             }else{
                 if(editTextPassword.text.toString() == editTextPasswordConfirm.text.toString()){
                     val user = User(null, login, password, name)
-                    viewModel.insertUser(user, dialog, dataBase)
+                    viewModel.insertUser(user, dialog)
                 }else{
                     linearMessage.visibility = View.VISIBLE
                     textMessage.text = string(R.string.error_password)

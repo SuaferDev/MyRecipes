@@ -14,11 +14,12 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <View
+            android:id="@+id/line"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1">
-        </LinearLayout>
+        </View>
 
         <LinearLayout
             android:id="@+id/linear"
@@ -34,10 +35,38 @@
             android:background="@drawable/background_dialog_create"
             tools:ignore="MissingConstraints">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/image_close"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/icon_close"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/image_edit"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/icon_edit"
+                    android:layout_gravity="end"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+
             <ImageView
                 android:id="@+id/image_food"
-                android:layout_width="280dp"
-                android:layout_height="280dp"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:maxWidth="300dp"
+                android:scaleType="centerCrop"
                 android:layout_gravity="center"/>
 
             <TextView
@@ -86,6 +115,15 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/text_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/jost"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="10dp" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/jost"
@@ -119,6 +157,7 @@
                 android:paddingEnd="50dp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/background_main_dark"
                 android:layout_gravity="center"/>

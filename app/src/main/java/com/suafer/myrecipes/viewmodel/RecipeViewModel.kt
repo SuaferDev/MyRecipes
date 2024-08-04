@@ -1,36 +1,29 @@
 package com.suafer.myrecipes.viewmodel
 
 import android.app.Dialog
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.User
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainViewModel(
-
+class RecipeViewModel(
+    private var dataBase : MyRecipesDataBase
 ) : ViewModel() {
 
     val resultLive = MutableLiveData<User?>()
 
-    fun insertUser(user: User, dialog: Dialog, dataBase: MyRecipesDataBase) {
+    constructor(context: Context) : this(MyRecipesDataBase.get(context))
+
+    fun getSteps(id: Int, dialog: Dialog) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataBase.dao().insertUser(user)
+            dataBase.dao().getStep(id)
             withContext(Dispatchers.Main) {
                 dialog.dismiss()
-            }
-        }
-    }
-
-    fun getUser(login: String, password: String, dataBase: MyRecipesDataBase){
-        var user : User?
-        viewModelScope.launch(Dispatchers.IO) {
-            user = dataBase.dao().getUser(login, password)
-            withContext(Dispatchers.Main){
-                resultLive.value = user
             }
         }
     }

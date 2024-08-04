@@ -18,6 +18,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        dataBinding = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -42,7 +46,9 @@ dependencies {
     implementation (libs.androidx.room.runtime)
     implementation (libs.androidx.room.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.databinding.runtime)
     kapt(libs.androidx.room.compiler)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
