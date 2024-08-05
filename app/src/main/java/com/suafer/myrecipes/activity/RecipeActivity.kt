@@ -1,6 +1,7 @@
 package com.suafer.myrecipes.activity
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ImageView
@@ -12,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.suafer.myrecipes.R
+import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.Viewer
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
@@ -30,6 +32,7 @@ class RecipeActivity : AppCompatActivity() {
 
     private lateinit var dataBase : MyRecipesDataBase
     private lateinit var loadingDialog: LoadingDialog
+    private lateinit var imageFood : ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +52,14 @@ class RecipeActivity : AppCompatActivity() {
         loadingDialog = LoadingDialog(this)
         dataBase = MyRecipesDataBase.get(this)
         id = intent.getIntExtra("ID_VALUE", -1)
+        imageFood = findViewById(R.id.image_food)
 
         findViewById<ImageView>(R.id.image_close).setOnClickListener { finish() }
 
         findViewById<ImageView>(R.id.image_edit).setOnClickListener {
             val i = Intent(this, CreateActivity::class.java)
             i.putExtra("ID_VALUE", id)
+            startActivity(i)
             finish()
         }
     }
@@ -76,8 +81,14 @@ class RecipeActivity : AppCompatActivity() {
         )
     }
 
-    private fun getImage(name : String){
-
+    private fun getImage(){
+        val bitmap = Tool.getImage("recipe_$id",this)
+        if(bitmap != null){
+            imageFood.scaleType = ImageView.ScaleType.CENTER_CROP
+            imageFood.setImageBitmap(bitmap)
+            imageFood.setPadding(0,0,0,0)
+            imageFood.setBackgroundResource(R.color.none)
+        }
     }
 
     private fun getData(){
@@ -87,6 +98,7 @@ class RecipeActivity : AppCompatActivity() {
             steps = dataBase.dao().getAllSteps(recipe.id!!)
             withContext(Dispatchers.Main){
                 setInfo()
+                getImage()
                 loadingDialog.close()
             }
         }

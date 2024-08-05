@@ -65,10 +65,11 @@
                     <ImageView
                         android:id="@+id/image_food"
                         android:layout_width="match_parent"
-                        android:layout_height="140dp"
+                        android:layout_height="200dp"
                         android:layout_gravity="center"
+                        android:padding="60dp"
                         android:background="@drawable/background_new_step"
-                        android:src="@drawable/icon_add_gray" />
+                        android:src="@drawable/icon_no_image" />
 
                     <TextView
                         android:id="@+id/text_name"

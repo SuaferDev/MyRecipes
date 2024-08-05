@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -17,13 +18,15 @@ import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.database.Recipe
 import com.suafer.myrecipes.dialog.PreviewDialog
 
+
 class CustomRecipeAdapter(private val context: Activity, private val arr: List<Recipe>) :
     RecyclerView.Adapter<CustomRecipeAdapter.ViewHolder>() {
 
     private val height = 100
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val linear: ConstraintLayout = itemView.findViewById(R.id.root_linear)
+        val rootLinear: ConstraintLayout = itemView.findViewById(R.id.root_linear)
+        val linear : LinearLayout = itemView.findViewById(R.id.linear)
         val imageFood: ImageView = itemView.findViewById(R.id.image_food)
         val textName: TextView = itemView.findViewById(R.id.text_name)
         val textTime: TextView = itemView.findViewById(R.id.text_time)
@@ -47,14 +50,13 @@ class CustomRecipeAdapter(private val context: Activity, private val arr: List<R
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         if (position == 0) {
-            holder.linear.setPadding(PADDING_CATEGORY_SIDE, height, PADDING_CATEGORY_SIDE, PADDING_CATEGORY_TOP)
+            holder.rootLinear.setPadding(PADDING_CATEGORY_SIDE, 300, PADDING_CATEGORY_SIDE, PADDING_CATEGORY_TOP)
         } else {
             if (position == arr.size - 1) {
-                holder.linear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, height)
+                holder.rootLinear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, height)
             } else {
-                holder.linear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP)
+                holder.rootLinear.setPadding(PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP, PADDING_CATEGORY_LEFT, PADDING_CATEGORY_TOP)
             }
         }
 

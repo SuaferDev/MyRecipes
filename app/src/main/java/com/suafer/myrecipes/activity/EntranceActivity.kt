@@ -3,12 +3,14 @@ package com.suafer.myrecipes.activity
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -18,12 +20,15 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.suafer.myrecipes.R
 import com.suafer.myrecipes.app.PopupWindowError
 import com.suafer.myrecipes.app.UserData
@@ -32,6 +37,7 @@ import com.suafer.myrecipes.app.Viewer.Companion.setDefaultEdit
 import com.suafer.myrecipes.app.Viewer.Companion.showErrorEdit
 import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.User
+import com.suafer.myrecipes.database.UserSave
 import com.suafer.myrecipes.dialog.LoadingDialog
 import com.suafer.myrecipes.viewmodel.EntranceViewModel
 import com.suafer.myrecipes.viewmodel.EntranceViewModelFactory
@@ -53,6 +59,9 @@ class EntranceActivity : AppCompatActivity() {
 
     private lateinit var viewModel : EntranceViewModel
 
+    private lateinit var saveUser : SharedPreferences
+    private var userSave : UserSave? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -69,6 +78,32 @@ class EntranceActivity : AppCompatActivity() {
         init()
     }
 
+    private fun loadUser() {
+        saveUser = getSharedPreferences("user", MODE_PRIVATE)
+        val gson = Gson()
+        val type = object : TypeToken<UserSave?>() {}.type
+        userSave = gson.fromJson(saveUser.getString("user", ""), type)
+    }
+
+    private fun autoEnter() {
+        if(userSave != null){
+            dialogLoading.show()
+            viewModel.getUser(userSave!!.login(), userSave!!.password())
+            viewModel.resultLive.observe(this) { user ->
+                dialogLoading.close()
+                if(user != null){
+                    UserData.instance.setId(user.id!!)
+                    val i = Intent(this@EntranceActivity, SearchActivity::class.java)
+                    startActivity(i)
+                    finish()
+                }else{ showErrorEdit(this@EntranceActivity, editTextLogin, editTextPassword); popupError.show(string(
+                    R.string.error_password
+                )) }
+            }
+        }
+
+    }
+
     private fun setWindowFlag(activity: Activity) {
         val win = activity.window
         val winParams = win.attributes
@@ -80,12 +115,15 @@ class EntranceActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, EntranceViewModelFactory(this))[EntranceViewModel::class.java]
         popupError = PopupWindowError(this)
         dialogLoading = LoadingDialog(this)
+        loadUser()
 
         findViewById<LinearLayout>(R.id.linear).startAnimation(AnimationUtils.loadAnimation(this, R.anim.main_animation))
 
         editTextLogin = findViewById(R.id.edit_text_login)
         editTextPassword = findViewById(R.id.edit_text_password)
         checkRemember = findViewById(R.id.check_remember)
+
+        autoEnter()
 
         val imageGoogle = findViewById<ImageView>(R.id.image_google)
 
@@ -108,6 +146,11 @@ class EntranceActivity : AppCompatActivity() {
                 dialogLoading.close()
                 if(user != null){
                     UserData.instance.setId(user.id!!)
+                    if(checkRemember.isChecked){
+                        userSave = UserSave(user.login, user.password)
+                        save()
+                    }
+
                     val i = Intent(this@EntranceActivity, SearchActivity::class.java)
                     startActivity(i)
                     finish()
@@ -173,6 +216,14 @@ class EntranceActivity : AppCompatActivity() {
             }
         }
         dialog.show()
+    }
+
+    private fun save(){
+        val editor: SharedPreferences.Editor = saveUser.edit()
+        val gson = Gson()
+        val json = gson.toJson(userSave)
+        editor.putString("user", json)
+        editor.apply()
     }
 
     private fun generateWatcher(editText: EditText) : TextWatcher{

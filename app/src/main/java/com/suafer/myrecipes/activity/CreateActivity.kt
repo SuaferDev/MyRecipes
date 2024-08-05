@@ -59,7 +59,6 @@ class CreateActivity : AppCompatActivity() {
     private val ingredients : MutableList<String> = mutableListOf()
     private val steps : MutableList<Step> = mutableListOf()
     private var recipeImage : Bitmap? = null
-    private val imageMap : MutableMap<String, Bitmap?> = mutableMapOf()
 
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_IMAGE_SELECT = 2
@@ -226,16 +225,22 @@ class CreateActivity : AppCompatActivity() {
                 REQUEST_IMAGE_CAPTURE -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap
                     recipeImage = imageBitmap
-                    imageFood.setImageBitmap(imageBitmap)
+                    setImage(imageBitmap)
                 }
                 REQUEST_IMAGE_SELECT -> {
                     val imageUri: Uri? = data?.data
                     val imageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, imageUri)
                     recipeImage = imageBitmap
-                    imageFood.setImageBitmap(imageBitmap)
+                    setImage(imageBitmap)
                 }
             }
         }
+    }
+
+    private fun setImage(imageBitmap : Bitmap) {
+        imageFood.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageFood.setImageBitmap(imageBitmap)
+        imageFood.setBackgroundResource(R.color.none)
     }
 
 
@@ -256,9 +261,7 @@ class CreateActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     val recipeImage = Tool.getImage("recipe_$id", this@CreateActivity)
                     if(recipeImage != null){
-                        imageFood.setImageBitmap(recipeImage)
-                        imageFood.scaleType = ImageView.ScaleType.CENTER_CROP
-                        imageFood.setBackgroundResource(R.color.none)
+                        setImage(recipeImage)
                     }
                     editName.setText(name);  editDescription.setText(description)
                     editType.setText(type)
