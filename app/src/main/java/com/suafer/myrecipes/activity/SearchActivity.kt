@@ -33,6 +33,7 @@ import com.suafer.myrecipes.adapter.CustomRecipeAdapter
 import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.app.UserData
 import com.suafer.myrecipes.app.Viewer
+import com.suafer.myrecipes.database.MyRecipesDataBase
 import com.suafer.myrecipes.database.Recipe
 import com.suafer.myrecipes.dialog.PreviewDialog
 import com.suafer.myrecipes.viewmodel.SearchViewModel
@@ -49,6 +50,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var textAZ : TextView; private lateinit var textZA : TextView
     private lateinit var linearFilter : HorizontalScrollView
     private lateinit var linearNoElement : LinearLayout
+
+    private lateinit var dataBase : MyRecipesDataBase
 
     private var recipes : List<Recipe> = listOf()
     private var sortRecipes : List<Recipe> = mutableListOf()
@@ -78,6 +81,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun init(){
+        dataBase = MyRecipesDataBase.get(this)
         viewModel = ViewModelProvider(this, SearchViewModelFactory(this))[SearchViewModel::class.java]
 
         listRecipes = findViewById(R.id.list_recipes)
@@ -130,9 +134,6 @@ class SearchActivity : AppCompatActivity() {
 
 
         linearNoElement = findViewById(R.id.linear_no_element)
-
-        /*listRecipes.setOnItemClickListener { _, _, position, _ -> PreviewDialog.show(this, sortRecipes[position]) }*/
-
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -188,7 +189,13 @@ class SearchActivity : AppCompatActivity() {
 
     private fun deleteElement(position : Int, dialog: Dialog){
         lifecycleScope.launch (Dispatchers.IO){
-            viewModel.delete(adapter.getID(position))
+            Tool.deleteImage(("recipe_" + adapter.getID(position)),this@SearchActivity)
+            val steps = dataBase.dao().getAllSteps(adapter.getID(position))
+            for(step in steps){
+                Tool.deleteImage(("step_" + step.id), this@SearchActivity)
+                dataBase.dao().deleteStep(step.id!!)
+            }
+            dataBase.dao().deleteRecipe(adapter.getID(position))
             withContext(Dispatchers.Main){
                 dialog.dismiss()
             }

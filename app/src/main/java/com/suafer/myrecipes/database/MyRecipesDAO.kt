@@ -43,7 +43,7 @@ interface MyRecipesDAO {
 
     /** Шаги рецепта **/
     @Insert
-    fun insertStep(step: Step)
+    fun insertStep(step: Step) : Long?
 
     @Query("SELECT * FROM steps WHERE recipeId = :recipeId")
     fun getAllSteps(recipeId: Int): MutableList<Step>

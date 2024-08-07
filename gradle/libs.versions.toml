@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.1"
+compiler = "3.1.4"
 gson = "2.10.1"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
@@ -19,10 +20,12 @@ databindingRuntime = "8.5.1"
 [libraries]
 android-room-ktx = { module = "android.room:room-ktx", version.ref = "roomKtxVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-databinding-common = { module = "androidx.databinding:databinding-common", version.ref = "databindingRuntime" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+compiler = { module = "com.android.databinding:compiler", version.ref = "compiler" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

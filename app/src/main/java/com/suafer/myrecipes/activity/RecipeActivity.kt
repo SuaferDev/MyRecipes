@@ -83,11 +83,7 @@ class RecipeActivity : AppCompatActivity() {
 
     private fun getImage(){
         val bitmap = Tool.getImage("recipe_$id",this)
-        if(bitmap != null){
-            imageFood.scaleType = ImageView.ScaleType.CENTER_CROP
-            imageFood.setImageBitmap(bitmap)
-            imageFood.setPadding(0,0,0,0)
-            imageFood.setBackgroundResource(R.color.none)
+        if(bitmap != null){ Viewer.setImage(imageFood, bitmap)
         }
     }
 
@@ -111,12 +107,13 @@ class RecipeActivity : AppCompatActivity() {
             val textCount = itemView.findViewById<TextView>(R.id.text_count)
             val textTime = itemView.findViewById<TextView>(R.id.text_time)
             val textDescription = itemView.findViewById<TextView>(R.id.text_description)
+            val image_food = itemView.findViewById<ImageView>(R.id.image_food)
             var str = (i + 1).toString()
             textCount.text = str
             str = "${steps[i].time} m"
             textTime.text = str
             textDescription.text = steps[i].description
-
+            Viewer.setImage(image_food, Tool.getImage("step_${steps[i].id}", this))
             linearSteps.addView(itemView)
         }
     }

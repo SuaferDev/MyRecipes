@@ -2,6 +2,7 @@ package com.suafer.myrecipes.app
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -53,6 +54,16 @@ class Viewer {
             val rotationAnimation = ObjectAnimator.ofFloat(imageView, "rotation", from, to)
             rotationAnimation.duration = 500
             rotationAnimation.start()
+        }
+
+        fun setImage(imageView: ImageView, bitmap: Bitmap?){
+            if(bitmap != null){
+                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                imageView.setImageBitmap(bitmap)
+                imageView.setPadding(0,0,0,0)
+                imageView.setBackgroundResource(R.color.none)
+            }
+
         }
 
         fun createIngredients(ingredientsGroup : ChipGroup, ingredients : List<String>, context: Context){

@@ -2,6 +2,11 @@
     <string name="app_name">Кулинариум</string>
     <string name="none"></string>
 
+    <!-- DialogImage -->
+    <string name="dialog_image_make_photo">To make a photo</string>
+    <string name="dialog_image_select">Select from gallery</string>
+    <string name="dialog_image_choose">Select image</string>
+
     <!-- MainActivity -->
     <string name="main_activity_create_dialog">Create Account</string>
     <string name="main_activity_name">Name</string>
@@ -60,6 +65,7 @@
     <string name="create_activity_save">save</string>
     <string name="create_activity_update">Successfully saved</string>
     <string name="create_activity_create">Successfully created</string>
+    <string name="create_activity_empty">Fields are empty</string>
 
     <!-- WarningDialogCreate -->
     <string name="warning_create_dialog_title">Cancel creation</string>

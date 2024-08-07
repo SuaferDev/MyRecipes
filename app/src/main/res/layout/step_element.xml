@@ -50,9 +50,11 @@
         android:id="@+id/image_food"
         android:layout_width="match_parent"
         android:layout_height="140dp"
-        android:padding="8dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:padding="40dp"
+        android:background="@drawable/background_new_step"
+        android:src="@drawable/icon_no_image"/>
 
     <TextView
         android:id="@+id/text_description"

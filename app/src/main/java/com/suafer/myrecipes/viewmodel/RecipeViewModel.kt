@@ -1,29 +1,44 @@
 package com.suafer.myrecipes.viewmodel
-
-import android.app.Dialog
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.graphics.Bitmap
+import androidx.lifecycle.*
+import com.suafer.myrecipes.app.Tool
 import com.suafer.myrecipes.database.MyRecipesDataBase
-import com.suafer.myrecipes.database.User
+import com.suafer.myrecipes.database.Recipe
+import com.suafer.myrecipes.database.Step
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RecipeViewModel(
-    private var dataBase : MyRecipesDataBase
-) : ViewModel() {
+class RecipeViewModel(private val dataBase: MyRecipesDataBase, private val context: Context) : ViewModel() {
 
-    val resultLive = MutableLiveData<User?>()
+    val recipe = MutableLiveData<Recipe>()
+    val steps = MutableLiveData<List<Step>>()
+    val loading = MutableLiveData<Boolean>()
+    val recipeImage = MutableLiveData<Bitmap?>()
 
-    constructor(context: Context) : this(MyRecipesDataBase.get(context))
 
-    fun getSteps(id: Int, dialog: Dialog) {
+
+
+    fun fetchRecipe(id: Int) {
+        loading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            dataBase.dao().getStep(id)
+            val fetchedRecipe = dataBase.dao().getRecipe(id)
+            val fetchedSteps = dataBase.dao().getAllSteps(id)
             withContext(Dispatchers.Main) {
-                dialog.dismiss()
+                recipe.value = fetchedRecipe!!
+                steps.value = fetchedSteps
+                loading.value = false
+                fetchImage(id)
+            }
+        }
+    }
+
+    private fun fetchImage(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bitmap = Tool.getImage("recipe_$id", context)
+            withContext(Dispatchers.Main) {
+                recipeImage.value = bitmap
             }
         }
     }

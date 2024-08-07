@@ -20,9 +20,6 @@ data class Step(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
 
-    @ColumnInfo(name = "image")
-    var image: String?,
-
     @ColumnInfo(name = "description")
     var description: String,
 
